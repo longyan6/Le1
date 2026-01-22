@@ -1,0 +1,2077 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>🧑🏻‍💻🧑🏻‍💻</title>
+
+  <style>
+    :root{
+      --wm-opacity: 0.03;
+      --wm-right: 10px;
+      --wm-bottom: 8px;
+
+      --tp-col-entry: 1.20fr;
+      --tp-col-lev:   0.80fr;
+      --tp-col-profit:1.20fr;
+
+      --p-col-m: 1.05fr;
+      --p-col-l: 0.75fr;
+      --p-col-e: 1.05fr;
+      --p-col-t: 1.05fr;
+
+      --in-font-base: 28;
+      --in-font-min:  14;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:#ffffff;
+      font-family: "Times New Roman","Songti SC","SimSun",serif;
+      color:#000;
+    }
+
+    .page{
+      width: min(1500px, 98vw);
+      margin: 16px auto;
+      background:#fff;
+    }
+
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 0 24px 10px;
+      flex-wrap: wrap;
+    }
+    .tabs{
+      position:relative;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tabBtn{
+      height: 44px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 10px;
+      background:#f1f1f1;
+      font-size: 18px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .tabBtn.active{
+      background:#dcdcdc;
+      font-weight: 700;
+    }
+    .langBox{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font-size: 18px;
+      flex-wrap: wrap;
+    }
+    .langSelect{
+      height: 44px;
+      background:#f7f7f7;
+      border: 0;
+      outline: none;
+      font-size: 18px;
+      padding: 0 10px;
+      border-radius: 10px;
+      font-family: inherit;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items:start;
+      padding: 0 24px 24px;
+    }
+
+    .panel{
+      position: relative;
+      background:#e9e9e9;
+      padding: 18px 22px 28px;
+      min-height: 520px;
+      overflow:hidden;
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom: 10px;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .tag{
+      width: 120px;
+      height: 44px;
+      background:#f7f7f7;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 26px;
+      flex: 0 0 auto;
+    }
+
+    .codeBox{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      font-size: 22px;
+      flex: 1 1 auto;
+      justify-content:flex-end;
+      flex-wrap: wrap;
+    }
+    .codeLabel{ white-space:nowrap; }
+
+    .codeInput{
+      width: 220px;
+      height: 44px;
+      background:#f7f7f7;
+      border: 0;
+      outline: none;
+      text-align:center;
+      font-size: 22px;
+      font-family: inherit;
+      padding: 0 10px;
+      text-transform: uppercase;
+      caret-color:#000;
+      border-radius: 10px;
+    }
+
+    .unitSelect{
+      height: 44px;
+      background:#f7f7f7;
+      border: 0;
+      outline: none;
+      font-size: 18px;
+      padding: 0 10px;
+      border-radius: 10px;
+      font-family: inherit;
+    }
+
+    .bar{ height: 14px; width: 100%; margin: 8px 0 10px; }
+
+    .wmHit{
+      position:absolute;
+      right: var(--wm-right);
+      bottom: var(--wm-bottom);
+      padding: 6px 10px;
+      user-select:none;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .watermark{
+      font-size: 38px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      opacity: var(--wm-opacity);
+      color:#000;
+      pointer-events:none;
+      text-shadow: 0 0 1px rgba(0,0,0,0.35);
+      transition: opacity .15s ease;
+    }
+    .wmHidden .watermark{ opacity: 0; }
+
+    /* ===================== TP（止盈价） ===================== */
+    .digitsRow{
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap: 12px;
+      margin: 0 0 10px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 12px;
+      color: rgba(0,0,0,.65);
+    }
+    .digitsRow select{
+      height: 28px;
+      border: 1px solid rgba(0,0,0,.35);
+      background:#f7f7f7;
+      border-radius: 8px;
+      padding: 0 8px;
+      outline: none;
+      font-size: 12px;
+    }
+
+    .tpHeadRow{
+      display:grid;
+      grid-template-columns: 1.15fr 0.8fr 0.9fr 0.9fr 0.9fr;
+      column-gap: 34px;
+      align-items:end;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    .tpHeadRow div{ white-space:nowrap; }
+
+    .tpInputRow{
+      display:grid;
+      grid-template-columns: 1.15fr 0.8fr 0.9fr 0.9fr 0.9fr;
+      column-gap: 34px;
+      align-items:center;
+    }
+
+    .triple{
+      grid-column: 1 / 4;
+      display:grid;
+      grid-template-columns: var(--tp-col-entry) var(--tp-col-lev) var(--tp-col-profit);
+      background:#efefef;
+      border: 1px solid rgba(0,0,0,0.22);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35);
+      height: 54px;
+    }
+    .triple .cell{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .triple .cell:not(:first-child){
+      border-left: 1px solid rgba(0,0,0,0.22);
+    }
+    .triple input{
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline:none;
+      background: rgba(255,255,255,0.25);
+      font-size: calc(var(--in-font-base) * 1px);
+      padding: 0 18px;
+      font-family: inherit;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    .triple input.caret-fix-on:focus{ text-align:left; padding-left: 18px; }
+    .triple input.caret-fix-on:not(:focus){ text-align:center; }
+
+    .pctWrap{ position:relative; width:100%; height:100%; }
+    .pctWrap input{ padding-right: 44px; }
+    .pctSuffix{
+      position:absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 26px;
+      pointer-events:none;
+      user-select:none;
+    }
+
+    .out{
+      font-size: 30px;
+      height: 54px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+    }
+
+    .tpTable{
+      margin-top: 32px;
+      display:grid;
+      grid-template-columns: 90px 180px;
+      row-gap: 18px;
+      column-gap: 80px;
+      justify-content:center;
+      align-items:center;
+      font-size: 30px;
+    }
+    .k{ text-align:center; }
+    .v{ text-align:center; }
+
+    .mobileTPRow{ display:none; }
+
+    /* ===================== Profit（利润） ===================== */
+    /* ✅ 你要的：利润小数位（放到红框位置：输入框下面那条） */
+    .profitDigitsRow{
+      display:flex;
+      justify-content:flex-start; /* 红框位置通常靠左更自然 */
+      align-items:center;
+      gap: 12px;
+      margin: 2px 0 1px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 12px;
+      color: rgba(0,0,0,.65);
+    }
+    .profitDigitsRow select{
+      height: 28px;
+      border: 1px solid rgba(0,0,0,.35);
+      background:#f7f7f7;
+      border-radius: 8px;
+      padding: 0 8px;
+      outline: none;
+      font-size: 12px;
+    }
+
+    .pHeadRow{
+      display:grid;
+      grid-template-columns: var(--p-col-m) var(--p-col-l) var(--p-col-e) var(--p-col-t);
+      column-gap: 22px;
+      align-items:end;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    .pHeadRow div{ white-space:nowrap; }
+
+    .pInputRow{
+      display:grid;
+      grid-template-columns: 1fr;
+      row-gap: 1px;
+      align-items:center;
+    }
+
+    .quad{
+      display:grid;
+      grid-template-columns: var(--p-col-m) var(--p-col-l) var(--p-col-e) var(--p-col-t);
+      background:#efefef;
+      border: 1px solid rgba(0,0,0,0.22);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35);
+      height: 54px;
+      column-gap: 22px;
+    }
+    .quad .cell{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,0.18);
+      border-left: 1px solid rgba(0,0,0,0.22);
+    }
+    .quad .cell:first-child{ border-left: 0; }
+    .quad input{
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline:none;
+      background: rgba(255,255,255,0.10);
+      font-size: calc(var(--in-font-base) * 1px);
+      padding: 0 14px;
+      font-family: inherit;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    .quad input.caret-fix-on:focus{ text-align:left; padding-left: 14px; }
+    .quad input.caret-fix-on:not(:focus){ text-align:center; }
+
+    .profitRow{
+      margin-top: 0px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .profitBox{
+      background:#f7f7f7;
+      border: 1px solid rgba(0,0,0,0.18);
+      padding: 14px 16px;
+      min-height: 110px;
+    }
+    .profitTitle{
+      font-size: 26px;
+      opacity: .9;
+      margin-bottom: 8px;
+    }
+    .profitValue{
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: .3px;
+    }
+
+    .pTable{
+      margin-top: 26px;
+      display:grid;
+      grid-template-columns: 90px 240px;
+      row-gap: 18px;
+      column-gap: 80px;
+      justify-content:center;
+      align-items:center;
+      font-size: 30px;
+    }
+
+    .mobileProfitRow{ display:none; }
+
+    .hidden{ display:none !important; }
+
+    /* ===================== 手机端 ===================== */
+    @media (max-width: 980px){
+      .page{ width:100%; margin:0; }
+      .toolbar{ padding: 12px 14px 6px; justify-content:flex-start; }
+      .tabBtn{ height: 40px; font-size: 16px; border-radius: 10px; }
+      .langSelect{ height: 40px; font-size: 16px; }
+
+      .row{
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 14px 14px 22px;
+      }
+      .panel{ padding: 14px 14px 18px; min-height:auto; }
+      .tag{ width: 92px; height: 40px; font-size: 22px; }
+      .codeBox{ width:auto; gap: 10px; font-size: 18px; justify-content:flex-start; }
+      .codeInput{ width: 160px; height: 40px; font-size: 18px; }
+      .unitSelect{ height: 40px; font-size: 16px; }
+      .bar{ height: 12px; margin: 8px 0 10px; }
+
+      /* TP */
+      .tpHeadRow{
+        grid-template-columns: 1fr 0.85fr 1fr;
+        column-gap: 16px;
+        font-size: 22px;
+        margin-bottom: 8px;
+      }
+      .tpHeadRow .deskOnly{ display:none; }
+      .tpInputRow{
+        grid-template-columns: 1fr;
+        row-gap: 12px;
+      }
+      #long_norm, #long_tp, #short_norm, #short_tp{ display:none; }
+      .triple{ grid-column:auto; height: 52px; }
+      .triple input{ font-size: 22px; padding: 0 12px; }
+      .pctSuffix{ font-size: 20px; right: 10px; }
+      .pctWrap input{ padding-right: 34px; }
+
+      .mobileTPRow{
+        display:grid;
+        grid-template-columns: auto 1fr;
+        align-items:end;
+        column-gap: 18px;
+        margin-top: 10px;
+        margin-bottom: 6px;
+      }
+      .mobileTPTitle{
+        font-size: 44px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .mobileTPValue{
+        font-size: 34px;
+        line-height: 1.1;
+        text-align:left;
+      }
+      .tpTable{ display:none; }
+
+      /* Profit */
+      .profitRow{ display:none; }
+      .pTable{ display:none; }
+
+      /* ✅ 手机端也要利润小数位：显示出来，并做成和 TP 类似的行 */
+      .profitDigitsRow{
+        justify-content:flex-start;
+        margin: 10px 0 6px;
+      }
+      .profitDigitsRow span{ font-size: 12px; }
+      .profitDigitsRow select{ height: 28px; font-size: 12px; }
+
+      .mobileProfitRow{
+        display:grid;
+        grid-template-columns: auto 1fr;
+        align-items:end;
+        column-gap: 18px;
+        margin-top: 0px;
+      }
+      .mobileProfitTitle{
+        font-size: 44px;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .mobileProfitValue{
+        font-size: 34px;
+        line-height: 1.1;
+        text-align:left;
+        font-weight: 700;
+      }
+
+      .watermark{ font-size: 26px; }
+    }
+  
+    /* ===== Hidden tab hit area (invisible) ===== */
+    #btn_hidden_hit{
+      position:absolute;
+      left: calc(100% + 6px);
+      top: 0;
+      width: 46px;
+      height: 44px;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      opacity: 0;
+      pointer-events: auto;
+      cursor: default;
+      user-select: none;
+    }
+    @media (max-width: 980px){
+      #btn_hidden_hit{
+        height: 40px;
+        width: 42px;
+      }
+    }
+
+  
+    /* ===================== Hidden Games ===================== */
+    .gameDir{ padding: 10px 6px 4px; }
+    .gameDirTitle{
+      text-align:center;
+      font-size: 34px;
+      font-weight: 800;
+      margin: 10px 0 18px;
+      letter-spacing: .3px;
+    }
+    .gameGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .gameCard{
+      appearance:none;
+      border: 1px solid rgba(0,0,0,0.18);
+      background:#f7f7f7;
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+      cursor: pointer;
+      text-align:left;
+      font-family: inherit;
+      color:#000;
+    }
+    .gameCard:active{ transform: translateY(1px); }
+    .gameName{ font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .gameDesc{ font-size: 18px; opacity: .82; line-height: 1.25; }
+
+    .gameWrap{ padding: 8px 6px 4px; }
+    .gameHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .gameTitle{ font-size: 34px; font-weight: 800; }
+    .gameControls{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .miniBtn{
+      height: 38px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 10px;
+      background:#f1f1f1;
+      font-size: 16px;
+      font-family: inherit;
+      cursor:pointer;
+    }
+    .miniBtn:active{ transform: translateY(1px); }
+    .miniStat{ font-size: 16px; opacity: .85; }
+
+    .gameHelp{
+      margin: 10px 0 10px;
+      font-size: 16px;
+      opacity: .8;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .gameStatus{
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      min-height: 28px;
+    }
+
+    /* Minesweeper */
+    .msBoard{
+      display:grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 2px;
+      width: min(520px, 92%);
+      margin: 14px auto 0;
+      user-select:none;
+      touch-action: manipulation;
+    }
+    .msCell{
+      aspect-ratio: 1 / 1;
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(0,0,0,0.20);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .msCell.revealed{
+      background: rgba(255,255,255,0.78);
+      cursor: default;
+    }
+    .msCell.flagged::after{ content:"🚩"; }
+    .msCell.mine::after{ content:"💣"; }
+    .msCell.disabled{ pointer-events:none; }
+
+    /* Angry Birds (simple) */
+    .abCanvas{
+      display:block;
+      width: min(980px, 100%);
+      max-width: 100%;
+      height: auto;
+      margin: 10px auto 0;
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(0,0,0,0.18);
+      border-radius: 12px;
+    }
+
+    @media (max-width: 980px){
+      .gameGrid{ grid-template-columns: 1fr; }
+      .gameDirTitle{ font-size: 30px; }
+      .gameTitle{ font-size: 30px; }
+      .gameName{ font-size: 26px; }
+      .gameDesc{ font-size: 16px; }
+      .msBoard{ width: min(380px, 96%); }
+      .msCell{ font-size: 16px; }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="toolbar">
+      <div class="tabs">
+        <button class="tabBtn active" id="btn_tp">止盈价</button>
+        <button class="tabBtn" id="btn_profit">利润</button>
+        <div id="btn_hidden_hit" aria-hidden="true"></div>
+      </div>
+      <div class="langBox">
+        <span id="lbl_lang">语言：</span>
+        <select class="langSelect" id="lang">
+          <option value="zh" selected>中文</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ===================== 止盈价 ===================== -->
+    <div id="page_tp">
+      <div class="row">
+
+        <section class="panel" id="tp_long_panel">
+          <div class="top">
+            <div class="tag" id="tag_long_tp">多单</div>
+            <div class="codeBox">
+              <div class="codeLabel" id="lbl_code_long_tp">代码：</div>
+              <input class="codeInput" id="long_code" value="" autocomplete="off">
+            </div>
+          </div>
+          <div class="bar" style="background:#76c043;"></div>
+
+          <div class="digitsRow">
+            <span id="lbl_digits_long">止盈价小数位：</span>
+            <select id="digits_long">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+            </select>
+          </div>
+
+          <div class="tpHeadRow">
+            <div id="h_long_entry">多单买入价</div>
+            <div id="h_long_lev">杠杆/倍</div>
+            <div id="h_long_profit">利润%</div>
+            <div class="deskOnly" id="h_long_norm">正常利润</div>
+            <div class="deskOnly" id="h_long_tp">止盈价</div>
+          </div>
+
+          <div class="tpInputRow">
+            <div class="triple">
+              <div class="cell"><input id="long_entry" value="" autocomplete="off" inputmode="decimal"></div>
+              <div class="cell"><input id="long_lev" class="caret-fix-on" value="" autocomplete="off" inputmode="numeric"></div>
+              <div class="cell">
+                <div class="pctWrap">
+                  <input id="long_profit" value="" autocomplete="off" inputmode="decimal">
+                  <span class="pctSuffix">%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="out" id="long_norm">—</div>
+            <div class="out" id="long_tp">—</div>
+          </div>
+
+          <div class="mobileTPRow">
+            <div class="mobileTPTitle" id="lbl_tp_mobile_long">止盈价</div>
+            <div class="mobileTPValue" id="long_tp_mobile">—</div>
+          </div>
+
+          <div class="tpTable" id="long_table"></div>
+          <div class="wmHit" data-wm="tp_long"><div class="watermark">Lee奇</div></div>
+        </section>
+
+        <section class="panel" id="tp_short_panel">
+          <div class="top">
+            <div class="tag" id="tag_short_tp">空单</div>
+            <div class="codeBox">
+              <div class="codeLabel" id="lbl_code_short_tp">代码：</div>
+              <input class="codeInput" id="short_code" value="" autocomplete="off">
+            </div>
+          </div>
+          <div class="bar" style="background:#ff1e1e;"></div>
+
+          <div class="digitsRow">
+            <span id="lbl_digits_short">止盈价小数位：</span>
+            <select id="digits_short">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+            </select>
+          </div>
+
+          <div class="tpHeadRow">
+            <div id="h_short_entry">空单买入价</div>
+            <div id="h_short_lev">杠杆/倍</div>
+            <div id="h_short_profit">利润%</div>
+            <div class="deskOnly" id="h_short_norm">正常利润</div>
+            <div class="deskOnly" id="h_short_tp">止盈价</div>
+          </div>
+
+          <div class="tpInputRow">
+            <div class="triple">
+              <div class="cell"><input id="short_entry" value="" autocomplete="off" inputmode="decimal"></div>
+              <div class="cell"><input id="short_lev" class="caret-fix-on" value="" autocomplete="off" inputmode="numeric"></div>
+              <div class="cell">
+                <div class="pctWrap">
+                  <input id="short_profit" value="" autocomplete="off" inputmode="decimal">
+                  <span class="pctSuffix">%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="out" id="short_norm">—</div>
+            <div class="out" id="short_tp">—</div>
+          </div>
+
+          <div class="mobileTPRow">
+            <div class="mobileTPTitle" id="lbl_tp_mobile_short">止盈价</div>
+            <div class="mobileTPValue" id="short_tp_mobile">—</div>
+          </div>
+
+          <div class="tpTable" id="short_table"></div>
+          <div class="wmHit" data-wm="tp_short"><div class="watermark">Lee奇</div></div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ===================== 利润 ===================== -->
+    <div id="page_profit" class="hidden">
+      <div class="row">
+
+        <section class="panel" id="p_long_panel">
+          <div class="top">
+            <div class="tag" id="tag_long_p">多单</div>
+            <div class="codeBox">
+              <div class="codeLabel" id="lbl_code_long_p">代码：</div>
+              <input class="codeInput" id="p_long_code" value="" autocomplete="off">
+
+              <div class="codeLabel" id="lbl_unit_long_p">单位：</div>
+              <select class="unitSelect" id="long_unit">
+                <option value="" selected id="opt_blank_long">留空</option>
+                <option value="USDT">USDT</option>
+                <option value="USDC">USDC</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+          <div class="bar" style="background:#76c043;"></div>
+
+          <div class="pHeadRow">
+            <div id="h_p_margin_long">保证金</div>
+            <div id="h_p_lev_long">杠杆</div>
+            <div id="h_p_entry_long">开仓均价</div>
+            <div id="h_p_target_long">目标价</div>
+          </div>
+
+          <div class="pInputRow">
+            <div class="quad">
+              <div class="cell"><input id="long_margin" value="" autocomplete="off" inputmode="decimal"></div>
+              <div class="cell"><input id="p_long_lev" class="caret-fix-on" value="" autocomplete="off" inputmode="numeric"></div>
+              <div class="cell"><input id="p_long_entry" value="" autocomplete="off" inputmode="decimal"></div>
+              <div class="cell"><input id="p_long_target" value="" autocomplete="off" inputmode="decimal"></div>
+            </div>
+
+            <!-- ✅ 放到你红框位置：输入框下面 -->
+            <div class="profitDigitsRow">
+              <span id="lbl_profit_digits_long">利润小数位：</span>
+              <select id="profit_digits_long">
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+              </select>
+            </div>
+
+            <div class="profitRow">
+              <div class="profitBox">
+                <div class="profitTitle" id="lbl_profit_long">利润</div>
+                <div class="profitValue" id="long_profit_amt">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mobileProfitRow">
+            <div class="mobileProfitTitle" id="lbl_profit_long_m">利润</div>
+            <div class="mobileProfitValue" id="long_profit_mobile">—</div>
+          </div>
+
+          <div class="pTable" id="p_long_table"></div>
+          <div class="wmHit" data-wm="p_long"><div class="watermark">Lee奇</div></div>
+        </section>
+
+        <section class="panel" id="p_short_panel">
+          <div class="top">
+            <div class="tag" id="tag_short_p">空单</div>
+            <div class="codeBox">
+              <div class="codeLabel" id="lbl_code_short_p">代码：</div>
+              <input class="codeInput" id="p_short_code" value="" autocomplete="off">
+
+              <div class="codeLabel" id="lbl_unit_short_p">单位：</div>
+              <select class="unitSelect" id="short_unit">
+                <option value="" selected id="opt_blank_short">留空</option>
+                <option value="USDT">USDT</option>
+                <option value="USDC">USDC</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+          <div class="bar" style="background:#ff1e1e;"></div>
+
+          <div class="pHeadRow">
+            <div id="h_p_margin_short">保证金</div>
+            <div id="h_p_lev_short">杠杆</div>
+            <div id="h_p_entry_short">开仓均价</div>
+            <div id="h_p_target_short">目标价</div>
+          </div>
+
+          <div class="pInputRow">
+            <div class="quad">
+              <div class="cell"><input id="short_margin" value="" autocomplete="off" inputmode="decimal"></div>
+              <div class="cell"><input id="p_short_lev" class="caret-fix-on" value="" autocomplete="off" inputmode="numeric"></div>
+              <div class="cell"><input id="p_short_entry" value="" autocomplete="off" inputmode="decimal"></div>
+              <div class="cell"><input id="p_short_target" value="" autocomplete="off" inputmode="decimal"></div>
+            </div>
+
+            <!-- ✅ 红框位置：输入框下面 -->
+            <div class="profitDigitsRow">
+              <span id="lbl_profit_digits_short">利润小数位：</span>
+              <select id="profit_digits_short">
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+              </select>
+            </div>
+
+            <div class="profitRow">
+              <div class="profitBox">
+                <div class="profitTitle" id="lbl_profit_short">利润</div>
+                <div class="profitValue" id="short_profit_amt">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mobileProfitRow">
+            <div class="mobileProfitTitle" id="lbl_profit_short_m">利润</div>
+            <div class="mobileProfitValue" id="short_profit_mobile">—</div>
+          </div>
+
+          <div class="pTable" id="p_short_table"></div>
+          <div class="wmHit" data-wm="p_short"><div class="watermark">Lee奇</div></div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+    <!-- ===================== 隐藏页 ===================== -->
+    <div id="page_hidden" class="hidden">
+      <div class="row">
+
+        <section class="panel" id="hidden_panel">
+          <div class="top">
+            <div class="tag" id="tag_hidden">游戏</div>
+
+            <!-- 仅在进入某个小游戏时显示，用于返回目录（不影响原页面外观） -->
+            <div class="codeBox" style="justify-content:flex-end;">
+              <button class="tabBtn" id="btn_hidden_back" style="display:none;" type="button">返回目录</button>
+            </div>
+          </div>
+
+          <div class="bar" style="background:#111; opacity:.12;"></div>
+
+          <!-- 目录 -->
+          <div id="hidden_dir" class="gameDir">
+            <div class="gameDirTitle" id="hidden_dir_title">休闲小游戏合集</div>
+            <div class="gameGrid">
+              <button class="gameCard" id="btn_game_minesweeper" type="button">
+                <div class="gameName" id="game_name_ms">扫雷</div>
+                <div class="gameDesc" id="game_desc_ms">经典扫雷：翻开格子，避开地雷</div>
+              </button>
+
+              <button class="gameCard" id="btn_game_birds" type="button">
+                <div class="gameName" id="game_name_ab">愤怒的小鸟</div>
+                <div class="gameDesc" id="game_desc_ab">拉弓发射小鸟，击中小猪</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 游戏 1：扫雷 -->
+          <div id="game_minesweeper" class="hidden gameWrap">
+            <div class="gameHeader">
+              <div class="gameTitle" id="ms_title">扫雷</div>
+              <div class="gameControls">
+                <button class="miniBtn" id="ms_new" type="button">新游戏</button>
+                <button class="miniBtn" id="ms_mode" type="button">标记模式：关</button>
+                <div class="miniStat"><span id="ms_mines_lbl">地雷</span>: <span id="ms_mines">10</span></div>
+                <div class="miniStat"><span id="ms_time_lbl">时间</span>: <span id="ms_time">0</span>s</div>
+              </div>
+            </div>
+            <div class="gameHelp" id="ms_help">点击翻开；右键或开启标记模式可插旗。</div>
+            <div id="ms_board" class="msBoard" aria-label="Minesweeper"></div>
+            <div class="gameStatus" id="ms_status"></div>
+          </div>
+
+          <!-- 游戏 2：愤怒的小鸟（简化版） -->
+          <div id="game_birds" class="hidden gameWrap">
+            <div class="gameHeader">
+              <div class="gameTitle" id="ab_title">愤怒的小鸟</div>
+              <div class="gameControls">
+                <button class="miniBtn" id="ab_reset" type="button">重开</button>
+                <div class="miniStat"><span id="ab_targets_lbl">目标</span>: <span id="ab_targets">3</span></div>
+              </div>
+            </div>
+            <div class="gameHelp" id="ab_help">拖动小鸟向后拉，松开发射，击中小猪。</div>
+            <canvas id="ab_canvas" width="900" height="420" class="abCanvas"></canvas>
+            <div class="gameStatus" id="ab_status"></div>
+          </div>
+
+          <div class="wmHit" data-wm="hidden"><div class="watermark">Lee奇</div></div>
+        </section>
+
+      </div>
+    </div>
+
+<script>
+// ===== Helpers =====
+    const $ = (id) => document.getElementById(id);
+
+    const LEV_LIST = [1, 5, 10, 20, 50, 100];
+
+    const DECIMAL_SEP = (() => {
+      try{
+        const s = new Intl.NumberFormat().format(1.1);
+        const m = s.match(/1([^0-9])1/);
+        return m ? m[1] : ".";
+      } catch { return "."; }
+    })();
+
+    function formatNumber(n, digits){
+      if (!Number.isFinite(n)) return "—";
+      const s = n.toFixed(digits);
+      return (DECIMAL_SEP === ".") ? s : s.replace(".", DECIMAL_SEP);
+    }
+
+    function normalizeNumberText(v){
+      v = String(v ?? "");
+      v = v.replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+      v = v.replace(/[．。]/g, ".").replace(/[，]/g, ",");
+      v = v.replace(/[\u00A0\u2000-\u200A\u202F\u205F\u3000]/g, " ");
+      return v;
+    }
+
+    function parseNum(v){
+      v = normalizeNumberText(v);
+      v = String(v ?? "");
+      v = v.replace(/[\u200B-\u200D\uFEFF]/g, "");
+      v = v.trim();
+      if (!v) return NaN;
+
+      v = v.replace(/\s+/g,'').replace(/,/g,'.');
+      const i = v.indexOf(".");
+      if (i !== -1){
+        v = v.slice(0, i+1) + v.slice(i+1).replace(/\./g,"");
+      }
+      const n = Number(v);
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    function filterDecimal(input){
+      input.addEventListener("input", () => {
+        let v = normalizeNumberText(input.value);
+        v = v.replace(/[\u200B-\u200D\uFEFF]/g, "");
+        v = v.replace(/[^0-9.,]/g, "");
+        const i = v.search(/[.,]/);
+        if (i !== -1){
+          const head = v.slice(0, i + 1);
+          const tail = v.slice(i + 1).replace(/[.,]/g, "");
+          v = head + tail;
+        }
+        if (input.value !== v) input.value = v;
+      });
+    }
+
+    function filterInteger(input){
+      input.addEventListener("input", () => {
+        const vv = normalizeNumberText(input.value);
+        const v = vv.replace(/[^\d]/g, "");
+        if (input.value !== v) input.value = v;
+      });
+    }
+
+    function bindUppercase(input){
+      input.addEventListener("input", () => {
+        const pos = input.selectionStart;
+        const up = input.value.toUpperCase();
+        if (input.value !== up){
+          input.value = up;
+          try{ input.setSelectionRange(pos, pos); }catch{}
+        }
+      });
+    }
+
+    // 页面切换
+    const btnTP = $("btn_tp");
+    const btnProfit = $("btn_profit");
+    const pageTP = $("page_tp");
+    const pageProfit = $("page_profit");
+
+    
+    const pageHidden = $("page_hidden");
+function setActiveTab(which){
+      const tpOn = (which === "tp");
+      pageTP.classList.toggle("hidden", !tpOn);
+      pageProfit.classList.toggle("hidden", tpOn);
+      
+      if (pageHidden) pageHidden.classList.add("hidden");
+btnTP.classList.toggle("active", tpOn);
+      btnProfit.classList.toggle("active", !tpOn);
+      scheduleRecalc();
+      setTimeout(scheduleRecalc, 50);
+    }
+    btnTP.addEventListener("click", () => setActiveTab("tp"));
+    btnProfit.addEventListener("click", () => setActiveTab("profit"));
+
+    // 隐藏入口：利润按钮右侧空白区域三连点进入隐藏页（外观不变）
+    (function bindHiddenEntry(){
+      const hit = $("btn_hidden_hit");
+      if (!hit || !pageHidden) return;
+      let clicks = 0;
+      let timer = 0;
+      hit.addEventListener("click", () => {
+        clicks++;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => { clicks = 0; timer = 0; }, 650);
+        if (clicks >= 3){
+          clicks = 0;
+          if (timer) clearTimeout(timer);
+          timer = 0;
+          pageTP.classList.add("hidden");
+          pageProfit.classList.add("hidden");
+          pageHidden.classList.remove("hidden");
+        }
+      }, { passive: true });
+    })();
+
+    // 水印三连点
+    function attachWatermarkToggle(hitEl){
+      let clicks = 0;
+      let timer = 0;
+      hitEl.addEventListener("click", () => {
+        clicks++;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => { clicks = 0; timer = 0; }, 650);
+        if (clicks >= 3){
+          clicks = 0;
+          if (timer) clearTimeout(timer);
+          timer = 0;
+          const panel = hitEl.closest(".panel");
+          panel.classList.toggle("wmHidden");
+        }
+      }, { passive: true });
+    }
+    document.querySelectorAll(".wmHit").forEach(attachWatermarkToggle);
+
+    // 语言
+    const I18N = {
+      zh: {
+        tabs_tp: "止盈价", tabs_profit: "利润", lang: "语言：",
+        long: "多单", short: "空单", code: "代码：",
+        digits: "止盈价小数位：", profitDigits: "利润小数位：",
+        long_entry: "多单买入价", short_entry: "空单买入价",
+        lev: "杠杆/倍", profit_pct: "利润%", norm: "正常利润", tp: "止盈价",
+        unit: "单位：", blank: "留空", margin: "保证金", lev2: "杠杆",
+        entry_avg: "开仓均价", target: "目标价", profit: "利润",
+        hidden_tag: "游戏",
+        hidden_dir_title: "休闲小游戏合集",
+        hidden_back: "返回目录",
+        game_ms_name: "扫雷",
+        game_ms_desc: "经典扫雷：翻开格子，避开地雷",
+        game_ab_name: "愤怒的小鸟",
+        game_ab_desc: "拉弓发射小鸟，击中小猪",
+        ms_title: "扫雷",
+        ms_new: "新游戏",
+        ms_flag_on: "标记模式：开",
+        ms_flag_off: "标记模式：关",
+        ms_help: "点击翻开；右键或开启标记模式可插旗。",
+        ms_mines: "地雷",
+        ms_time: "时间",
+        ms_win: "你赢了！",
+        ms_lose: "踩雷了！",
+        ab_title: "愤怒的小鸟",
+        ab_reset: "重开",
+        ab_help: "拖动小鸟向后拉，松开发射，击中小猪。",
+        ab_targets: "目标",
+        ab_win: "全部命中！",
+        ab_try: "再来一次？"
+
+      },
+      en: {
+        tabs_tp: "Take Profit", tabs_profit: "Profit", lang: "Language:",
+        long: "Long", short: "Short", code: "Symbol:",
+        digits: "TP decimals:", profitDigits: "Profit decimals:",
+        long_entry: "Long entry", short_entry: "Short entry",
+        lev: "Leverage", profit_pct: "Profit %", norm: "Normal", tp: "Take Profit",
+        unit: "Unit:", blank: "Blank", margin: "Margin", lev2: "Leverage",
+        entry_avg: "Entry Avg", target: "Target", profit: "Profit",
+        hidden_tag: "Games",
+        hidden_dir_title: "Casual Mini Games",
+        hidden_back: "Back to list",
+        game_ms_name: "Minesweeper",
+        game_ms_desc: "Classic: reveal cells, avoid mines",
+        game_ab_name: "Angry Birds",
+        game_ab_desc: "Pull back and launch, hit the pigs",
+        ms_title: "Minesweeper",
+        ms_new: "New",
+        ms_flag_on: "Flag mode: ON",
+        ms_flag_off: "Flag mode: OFF",
+        ms_help: "Click to reveal. Right-click or enable flag mode to place flags.",
+        ms_mines: "Mines",
+        ms_time: "Time",
+        ms_win: "You win!",
+        ms_lose: "Boom! You lost.",
+        ab_title: "Angry Birds",
+        ab_reset: "Reset",
+        ab_help: "Drag the bird back, release to launch, hit the pigs.",
+        ab_targets: "Targets",
+        ab_win: "All targets down!",
+        ab_try: "Try again?"
+
+      },
+      de: {
+        tabs_tp: "Take-Profit", tabs_profit: "Gewinn", lang: "Sprache:",
+        long: "Long", short: "Short", code: "Symbol:",
+        digits: "TP Dezimalstellen:", profitDigits: "Gewinn Dezimalstellen:",
+        long_entry: "Long Einstieg", short_entry: "Short Einstieg",
+        lev: "Hebel", profit_pct: "Profit %", norm: "Normal", tp: "Take-Profit",
+        unit: "Einheit:", blank: "Leer", margin: "Marge", lev2: "Hebel",
+        entry_avg: "Einstieg Ø", target: "Ziel", profit: "Gewinn",
+        hidden_tag: "Spiele",
+        hidden_dir_title: "Mini-Spielesammlung",
+        hidden_back: "Zurück zur Liste",
+        game_ms_name: "Minesweeper",
+        game_ms_desc: "Klassiker: Felder aufdecken, Minen vermeiden",
+        game_ab_name: "Angry Birds",
+        game_ab_desc: "Zurückziehen und abschießen, Schweine treffen",
+        ms_title: "Minesweeper",
+        ms_new: "Neu",
+        ms_flag_on: "Markieren: AN",
+        ms_flag_off: "Markieren: AUS",
+        ms_help: "Klicken zum Aufdecken. Rechtsklick oder Markiermodus für Flaggen.",
+        ms_mines: "Minen",
+        ms_time: "Zeit",
+        ms_win: "Gewonnen!",
+        ms_lose: "Boom! Verloren.",
+        ab_title: "Angry Birds",
+        ab_reset: "Neu starten",
+        ab_help: "Vogel zurückziehen, loslassen, Schweine treffen.",
+        ab_targets: "Ziele",
+        ab_win: "Alle Ziele getroffen!",
+        ab_try: "Nochmal?"
+
+      }
+    };
+
+    // ✅ 用映射表减少重复 textContent 赋值（功能不变）
+    const LANG_BIND = [
+      ["btn_tp","tabs_tp"],["btn_profit","tabs_profit"],["lbl_lang","lang"],
+      ["tag_long_tp","long"],["tag_short_tp","short"],["lbl_code_long_tp","code"],["lbl_code_short_tp","code"],
+      ["lbl_digits_long","digits"],["lbl_digits_short","digits"],
+      ["h_long_entry","long_entry"],["h_short_entry","short_entry"],
+      ["h_long_lev","lev"],["h_short_lev","lev"],
+      ["h_long_profit","profit_pct"],["h_short_profit","profit_pct"],
+      ["h_long_norm","norm"],["h_short_norm","norm"],
+      ["h_long_tp","tp"],["h_short_tp","tp"],
+      ["lbl_tp_mobile_long","tp"],["lbl_tp_mobile_short","tp"],
+      ["tag_long_p","long"],["tag_short_p","short"],
+      ["lbl_code_long_p","code"],["lbl_code_short_p","code"],
+      ["lbl_unit_long_p","unit"],["lbl_unit_short_p","unit"],
+      ["opt_blank_long","blank"],["opt_blank_short","blank"],
+      ["h_p_margin_long","margin"],["h_p_margin_short","margin"],
+      ["h_p_lev_long","lev2"],["h_p_lev_short","lev2"],
+      ["h_p_entry_long","entry_avg"],["h_p_entry_short","entry_avg"],
+      ["h_p_target_long","target"],["h_p_target_short","target"],
+      ["lbl_profit_long","profit"],["lbl_profit_short","profit"],
+      ["lbl_profit_long_m","profit"],["lbl_profit_short_m","profit"],
+      ["lbl_profit_digits_long","profitDigits"],["lbl_profit_digits_short","profitDigits"],
+          ["tag_hidden","hidden_tag"],
+      ["btn_hidden_back","hidden_back"],
+      ["hidden_dir_title","hidden_dir_title"],
+      ["game_name_ms","game_ms_name"],
+      ["game_desc_ms","game_ms_desc"],
+      ["game_name_ab","game_ab_name"],
+      ["game_desc_ab","game_ab_desc"],
+      ["ms_title","ms_title"],
+      ["ms_new","ms_new"],
+      ["ms_help","ms_help"],
+      ["ms_mines_lbl","ms_mines"],
+      ["ms_time_lbl","ms_time"],
+      ["ab_title","ab_title"],
+      ["ab_reset","ab_reset"],
+      ["ab_help","ab_help"],
+      ["ab_targets_lbl","ab_targets"],
+];
+
+    function applyLang(lang){
+      const t = I18N[lang] || I18N.zh;
+      for (const [id,key] of LANG_BIND){
+        const el = $(id);
+        if (el) el.textContent = t[key];
+      }
+    }
+
+    // TP 计算
+    let DIGITS_LONG = 3;
+    let DIGITS_SHORT = 3;
+
+    function renderTPTable(el, normalPct){
+      el.innerHTML = "";
+      for (const L of LEV_LIST){
+        const k = document.createElement("div");
+        k.className = "k";
+        k.textContent = L;
+
+        const v = document.createElement("div");
+        v.className = "v";
+        v.textContent = Number.isFinite(normalPct) ? (formatNumber(normalPct * L, 2) + "%") : "—";
+
+        el.appendChild(k);
+        el.appendChild(v);
+      }
+    }
+
+    function calcTP(isLong){
+      const entry = parseNum($(isLong ? "long_entry" : "short_entry").value);
+      const lev   = parseNum($(isLong ? "long_lev"   : "short_lev").value);
+      const profitPct = parseNum($(isLong ? "long_profit" : "short_profit").value);
+
+      const norm = (Number.isFinite(profitPct) && Number.isFinite(lev) && lev !== 0) ? (profitPct / lev) : NaN;
+      const digits = isLong ? DIGITS_LONG : DIGITS_SHORT;
+
+      const normOut = $(isLong ? "long_norm" : "short_norm");
+      const tpOut   = $(isLong ? "long_tp" : "short_tp");
+
+      normOut.textContent = Number.isFinite(norm) ? (formatNumber(norm, 2) + "%") : "—";
+
+      let tpBase = NaN;
+      if (Number.isFinite(entry) && Number.isFinite(norm)){
+        tpBase = isLong ? entry * (1 + norm/100) : entry * (1 - norm/100);
+        tpOut.textContent = formatNumber(tpBase, digits);
+      } else {
+        tpOut.textContent = "—";
+      }
+
+      const tpMobile = $(isLong ? "long_tp_mobile" : "short_tp_mobile");
+      if (tpMobile){
+        tpMobile.textContent = Number.isFinite(tpBase) ? formatNumber(tpBase, digits) : "—";
+      }
+
+      renderTPTable($(isLong ? "long_table" : "short_table"), norm);
+    }
+
+    // Profit 计算
+    function initProfitTable(tableEl){
+      tableEl.innerHTML = "";
+      const valueCells = [];
+      for (const L of LEV_LIST){
+        const k = document.createElement("div");
+        k.className = "k";
+        k.textContent = L;
+
+        const v = document.createElement("div");
+        v.className = "v";
+        v.textContent = "—";
+
+        tableEl.appendChild(k);
+        tableEl.appendChild(v);
+        valueCells.push(v);
+      }
+      return valueCells;
+    }
+    const pLongCells  = initProfitTable($("p_long_table"));
+    const pShortCells = initProfitTable($("p_short_table"));
+
+    function updateProfitTable(valueCells, margin, deltaPct, isLong, digits){
+      for (let i=0;i<LEV_LIST.length;i++){
+        const L = LEV_LIST[i];
+        let p = NaN;
+        if (Number.isFinite(margin) && Number.isFinite(deltaPct)){
+          const eff = isLong ? deltaPct : (-deltaPct);
+          p = margin * L * eff;
+        }
+        valueCells[i].textContent = Number.isFinite(p) ? formatNumber(p, digits) : "—";
+      }
+    }
+
+    function getProfitDigits(isLong){
+      const sel = $(isLong ? "profit_digits_long" : "profit_digits_short");
+      let digits = Number(sel?.value);
+      if (!Number.isFinite(digits)) digits = 3;
+      return Math.min(7, Math.max(2, digits));
+    }
+
+    function calcProfit(isLong){
+      const id = isLong ? "long" : "short";
+
+      const margin = parseNum($(id + "_margin").value);
+      const lev    = parseNum($("p_" + id + "_lev").value);
+      const entry  = parseNum($("p_" + id + "_entry").value);
+      const target = parseNum($("p_" + id + "_target").value);
+
+      const unit = $(id + "_unit").value || "";
+      const digits = getProfitDigits(isLong);
+
+      let deltaPct = NaN;
+      if (Number.isFinite(entry) && entry !== 0 && Number.isFinite(target)){
+        deltaPct = (target / entry) - 1;
+      }
+
+      let profit = NaN;
+      if (Number.isFinite(margin) && Number.isFinite(lev) && lev !== 0 && Number.isFinite(deltaPct)){
+        const eff = isLong ? deltaPct : (-deltaPct);
+        profit = margin * lev * eff;
+      }
+
+      const raw = Number.isFinite(profit) ? formatNumber(profit, digits) : "—";
+      const text = (raw === "—") ? "—" : (raw + (unit ? (" " + unit) : ""));
+
+      $(id + "_profit_amt").textContent = text;
+      const mob = $(id + "_profit_mobile");
+      if (mob) mob.textContent = text;
+
+      updateProfitTable(isLong ? pLongCells : pShortCells, margin, deltaPct, isLong, digits);
+    }
+
+    function recalcAll(){
+      calcTP(true);
+      calcTP(false);
+      calcProfit(true);
+      calcProfit(false);
+    }
+
+    let rafId = 0;
+    function scheduleRecalc(){
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        recalcAll();
+      });
+    }
+
+    function bindRecalc(el){
+      ["input","change","keyup","blur"].forEach(ev=> el.addEventListener(ev, scheduleRecalc));
+      el.addEventListener("keydown", (e)=>{ if (e.key === "Enter"){ el.blur(); scheduleRecalc(); } });
+    }
+
+    // 绑定：TP
+    const selL = $("digits_long");
+    const selS = $("digits_short");
+
+    selL.addEventListener("change", () => {
+      const n = Number(selL.value);
+      DIGITS_LONG = Number.isFinite(n) ? Math.min(7, Math.max(2, n)) : 3;
+      scheduleRecalc();
+    });
+    selS.addEventListener("change", () => {
+      const n = Number(selS.value);
+      DIGITS_SHORT = Number.isFinite(n) ? Math.min(7, Math.max(2, n)) : 3;
+      scheduleRecalc();
+    });
+
+    // ✅ 批量绑定更简洁（功能不变）
+    const bindList = (ids, fn) => ids.forEach(id => { const el = $(id); fn(el); bindRecalc(el); });
+
+    bindList(["long_entry","long_profit","short_entry","short_profit"], filterDecimal);
+    ["long_lev","short_lev"].forEach(id => { const el=$(id); filterInteger(el); bindRecalc(el); });
+
+    bindUppercase($("long_code"));
+    bindUppercase($("short_code"));
+
+    // 绑定：Profit
+    bindList(["long_margin","p_long_entry","p_long_target","short_margin","p_short_entry","p_short_target"], filterDecimal);
+    ["p_long_lev","p_short_lev"].forEach(id => { const el=$(id); filterInteger(el); bindRecalc(el); });
+
+    $("long_unit").addEventListener("change", scheduleRecalc);
+    $("short_unit").addEventListener("change", scheduleRecalc);
+
+    $("profit_digits_long").addEventListener("change", scheduleRecalc);
+    $("profit_digits_short").addEventListener("change", scheduleRecalc);
+
+    bindUppercase($("p_long_code"));
+    bindUppercase($("p_short_code"));
+
+    // 语言选择
+    const langSel = $("lang");
+    langSel.addEventListener("change", () => {
+      applyLang(langSel.value);
+      if (typeof gamesSetLang === "function") gamesSetLang(langSel.value);
+      scheduleRecalc();
+    });
+
+    
+
+    // ===================== Hidden Games =====================
+    let G_LANG = "zh";
+    const hiddenDir  = $("hidden_dir");
+    const btnBack    = $("btn_hidden_back");
+
+    const viewMS = $("game_minesweeper");
+    const viewAB = $("game_birds");
+
+    const btnMS = $("btn_game_minesweeper");
+    const btnAB = $("btn_game_birds");
+
+    function gt(key){
+      const pack = I18N[G_LANG] || I18N.zh;
+      return (pack && key in pack) ? pack[key] : (I18N.zh[key] || "");
+    }
+
+    function showHiddenDir(){
+      if (!pageHidden) return;
+      hiddenDir && hiddenDir.classList.remove("hidden");
+      viewMS && viewMS.classList.add("hidden");
+      viewAB && viewAB.classList.add("hidden");
+      if (btnBack) btnBack.style.display = "none";
+      AB.stop();
+      MS.pauseTimer();
+    }
+
+    function showHiddenGame(which){
+      if (!pageHidden) return;
+      hiddenDir && hiddenDir.classList.add("hidden");
+      if (btnBack) btnBack.style.display = "";
+      if (which === "ms"){
+        viewMS && viewMS.classList.remove("hidden");
+        viewAB && viewAB.classList.add("hidden");
+        AB.stop();
+        MS.ensure();
+      } else {
+        viewAB && viewAB.classList.remove("hidden");
+        viewMS && viewMS.classList.add("hidden");
+        MS.pauseTimer();
+        AB.ensure();
+      }
+      gamesSetLang(G_LANG);
+    }
+
+    // Directory bindings
+    btnMS && btnMS.addEventListener("click", () => showHiddenGame("ms"));
+    btnAB && btnAB.addEventListener("click", () => showHiddenGame("ab"));
+    btnBack && btnBack.addEventListener("click", () => showHiddenDir());
+
+    // When hidden page becomes visible, always land on directory
+    if (pageHidden){
+      const obs = new MutationObserver(() => {
+        if (!pageHidden.classList.contains("hidden")){
+          showHiddenDir();
+        }
+      });
+      obs.observe(pageHidden, { attributes:true, attributeFilter:["class"] });
+    }
+
+    function gamesSetLang(lang){
+      G_LANG = lang || "zh";
+
+      // static labels are handled by applyLang via LANG_BIND; here we fix dynamic texts
+      MS.updateModeText();
+      MS.refreshStatusText();
+      AB.refreshStatusText();
+    }
+
+    // ===================== Game 1: Minesweeper =====================
+    const MS = (() => {
+      const SIZE = 9;
+      const MINES = 10;
+
+      const boardEl = $("ms_board");
+      const statusEl = $("ms_status");
+      const minesEl = $("ms_mines");
+      const timeEl  = $("ms_time");
+      const newBtn  = $("ms_new");
+      const modeBtn = $("ms_mode");
+
+      let cells = [];
+      let isMine = [];
+      let adj = [];
+      let revealed = [];
+      let flagged = [];
+      let alive = true;
+      let started = false;
+      let flagMode = false;
+
+      let time = 0;
+      let timer = 0;
+      let statusKey = "";
+
+      const inBounds = (r,c)=> r>=0 && c>=0 && r<SIZE && c<SIZE;
+      const idx = (r,c)=> r*SIZE + c;
+
+      function setStatus(key){
+        statusKey = key || "";
+        if (statusEl) statusEl.textContent = key ? gt(key) : "";
+      }
+
+      function setTime(n){
+        time = n|0;
+        if (timeEl) timeEl.textContent = String(time);
+      }
+
+      function startTimer(){
+        if (timer) return;
+        timer = setInterval(()=> setTime(time + 1), 1000);
+      }
+
+      function pauseTimer(){
+        if (timer) clearInterval(timer);
+        timer = 0;
+      }
+
+      function minesLeft(){
+        const f = flagged.reduce((a,b)=>a+(b?1:0),0);
+        return MINES - f;
+      }
+
+      function updateMinesLeft(){
+        if (minesEl) minesEl.textContent = String(minesLeft());
+      }
+
+      function updateModeText(){
+        if (!modeBtn) return;
+        modeBtn.textContent = flagMode ? gt("ms_flag_on") : gt("ms_flag_off");
+      }
+
+      function placeMines(){
+        isMine = Array(SIZE*SIZE).fill(false);
+        let placed = 0;
+        while (placed < MINES){
+          const i = Math.floor(Math.random() * SIZE*SIZE);
+          if (!isMine[i]){
+            isMine[i]=true;
+            placed++;
+          }
+        }
+      }
+
+      function computeAdj(){
+        adj = Array(SIZE*SIZE).fill(0);
+        for (let r=0;r<SIZE;r++){
+          for (let c=0;c<SIZE;c++){
+            const i = idx(r,c);
+            if (isMine[i]) continue;
+            let count=0;
+            for (let dr=-1;dr<=1;dr++){
+              for (let dc=-1;dc<=1;dc++){
+                if (!dr && !dc) continue;
+                const rr=r+dr, cc=c+dc;
+                if (inBounds(rr,cc) && isMine[idx(rr,cc)]) count++;
+              }
+            }
+            adj[i]=count;
+          }
+        }
+      }
+
+      function buildDOM(){
+        if (!boardEl) return;
+        boardEl.innerHTML = "";
+        cells = [];
+        for (let i=0;i<SIZE*SIZE;i++){
+          const d = document.createElement("div");
+          d.className = "msCell";
+          d.dataset.i = String(i);
+          boardEl.appendChild(d);
+          cells.push(d);
+        }
+
+        // click
+        boardEl.addEventListener("click", (e)=>{
+          const el = e.target.closest(".msCell");
+          if (!el) return;
+          const i = Number(el.dataset.i);
+          if (!Number.isFinite(i)) return;
+          if (flagMode) toggleFlag(i);
+          else reveal(i);
+        });
+
+        // right-click -> flag
+        boardEl.addEventListener("contextmenu", (e)=>{
+          const el = e.target.closest(".msCell");
+          if (!el) return;
+          e.preventDefault();
+          const i = Number(el.dataset.i);
+          if (!Number.isFinite(i)) return;
+          toggleFlag(i);
+        });
+
+        // long press -> flag
+        let lp = 0;
+        boardEl.addEventListener("touchstart", (e)=>{
+          const el = e.target.closest(".msCell");
+          if (!el) return;
+          const i = Number(el.dataset.i);
+          if (!Number.isFinite(i)) return;
+          lp = setTimeout(()=>{ toggleFlag(i); lp=0; }, 420);
+        }, { passive:true });
+        boardEl.addEventListener("touchend", ()=>{
+          if (lp) clearTimeout(lp);
+          lp=0;
+        }, { passive:true });
+      }
+
+      function renderBlank(){
+        for (const c of cells){
+          c.className = "msCell";
+          c.textContent = "";
+        }
+      }
+
+      function revealAllMines(){
+        for (let i=0;i<SIZE*SIZE;i++){
+          if (isMine[i] && cells[i]){
+            cells[i].classList.add("mine");
+          }
+        }
+      }
+
+      function lockBoard(){
+        for (const c of cells) c.classList.add("disabled");
+      }
+
+      function checkWin(){
+        if (!alive) return;
+        for (let i=0;i<SIZE*SIZE;i++){
+          if (!isMine[i] && !revealed[i]) return;
+        }
+        alive=false;
+        pauseTimer();
+        setStatus("ms_win");
+        lockBoard();
+      }
+
+      function flood(start){
+        const stack=[start];
+        while(stack.length){
+          const cur = stack.pop();
+          const r = (cur / SIZE) | 0;
+          const c = cur % SIZE;
+          for (let dr=-1;dr<=1;dr++){
+            for (let dc=-1;dc<=1;dc++){
+              if (!dr && !dc) continue;
+              const rr=r+dr, cc=c+dc;
+              if (!inBounds(rr,cc)) continue;
+              const j = idx(rr,cc);
+              if (revealed[j] || flagged[j] || isMine[j]) continue;
+              revealed[j]=true;
+              const n=adj[j];
+              if (cells[j]){
+                cells[j].classList.add("revealed");
+                cells[j].textContent = n ? String(n) : "";
+              }
+              if (n===0) stack.push(j);
+            }
+          }
+        }
+      }
+
+      function reveal(i){
+        if (!alive || revealed[i] || flagged[i]) return;
+
+        if (!started){
+          started=true;
+          startTimer();
+        }
+
+        revealed[i]=true;
+
+        if (isMine[i]){
+          alive=false;
+          pauseTimer();
+          setStatus("ms_lose");
+          revealAllMines();
+          lockBoard();
+          return;
+        }
+
+        const n=adj[i];
+        if (cells[i]){
+          cells[i].classList.add("revealed");
+          cells[i].textContent = n ? String(n) : "";
+        }
+        if (n===0) flood(i);
+        checkWin();
+      }
+
+      function toggleFlag(i){
+        if (!alive || revealed[i]) return;
+        flagged[i]=!flagged[i];
+        if (cells[i]) cells[i].classList.toggle("flagged", flagged[i]);
+        updateMinesLeft();
+      }
+
+      function reset(){
+        alive=true;
+        started=false;
+        setTime(0);
+        pauseTimer();
+        setStatus("");
+
+        revealed = Array(SIZE*SIZE).fill(false);
+        flagged  = Array(SIZE*SIZE).fill(false);
+
+        placeMines();
+        computeAdj();
+        renderBlank();
+        updateMinesLeft();
+        updateModeText();
+      }
+
+      function ensure(){
+        if (!boardEl) return;
+        if (!cells.length) buildDOM();
+        if (!isMine.length) reset();
+      }
+
+      newBtn && newBtn.addEventListener("click", ()=> reset());
+      modeBtn && modeBtn.addEventListener("click", ()=>{
+        flagMode = !flagMode;
+        updateModeText();
+      });
+
+      function refreshStatusText(){
+        if (!statusEl) return;
+        if (!statusKey) return;
+        statusEl.textContent = gt(statusKey);
+      }
+
+      return {
+        ensure,
+        reset,
+        pauseTimer,
+        updateModeText,
+        refreshStatusText,
+      };
+    })();
+
+    // ===================== Game 2: Angry Birds (simple) =====================
+    const AB = (() => {
+      const canvas = $("ab_canvas");
+      const ctx = canvas ? canvas.getContext("2d") : null;
+      const resetBtn = $("ab_reset");
+      const targetsEl = $("ab_targets");
+      const statusEl = $("ab_status");
+
+      const sling = { x: 140, y: 310 };
+      const bird0 = { x: sling.x, y: sling.y, r: 14 };
+
+      const gravity = 0.45;
+      const damp = 0.985;
+
+      let bird = { x: bird0.x, y: bird0.y, vx:0, vy:0, r: bird0.r, launched:false };
+      let pigs = [];
+      let dragging=false;
+      let statusKey="";
+
+      function setStatus(key){
+        statusKey = key || "";
+        if (statusEl) statusEl.textContent = key ? gt(key) : "";
+      }
+
+      function resetWorld(){
+        bird = { x: bird0.x, y: bird0.y, vx:0, vy:0, r: bird0.r, launched:false };
+        pigs = [
+          { x: 650, y: 330, r: 16, alive:true },
+          { x: 720, y: 330, r: 16, alive:true },
+          { x: 685, y: 285, r: 16, alive:true },
+        ];
+        if (targetsEl) targetsEl.textContent = String(pigs.filter(p=>p.alive).length);
+        setStatus("");
+        draw();
+      }
+
+      function pointerPos(e){
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+        return { x, y };
+      }
+
+      function clampPull(px,py){
+        const dx = px - sling.x;
+        const dy = py - sling.y;
+        const max = 85;
+        const d = Math.hypot(dx,dy) || 1;
+        const k = d>max ? (max/d) : 1;
+        return { x: sling.x + dx*k, y: sling.y + dy*k };
+      }
+
+      function hitPig(p){
+        p.alive=false;
+        if (targetsEl) targetsEl.textContent = String(pigs.filter(pp=>pp.alive).length);
+        if (pigs.every(pp=>!pp.alive)){
+          setStatus("ab_win");
+          setTimeout(()=> stop(), 700);
+        }
+      }
+
+      function step(){
+        if (!ctx) return;
+
+        if (bird.launched){
+          bird.vy += gravity;
+          bird.vx *= damp;
+          bird.vy *= damp;
+          bird.x += bird.vx;
+          bird.y += bird.vy;
+
+          // ground
+          const groundY = 360;
+          if (bird.y + bird.r > groundY){
+            bird.y = groundY - bird.r;
+            bird.vy *= -0.45;
+            bird.vx *= 0.7;
+            if (Math.abs(bird.vy) < 0.6) bird.vy = 0;
+          }
+
+          // bounds
+          if (bird.x < bird.r){ bird.x = bird.r; bird.vx *= -0.5; }
+          if (bird.x > canvas.width - bird.r){ bird.x = canvas.width - bird.r; bird.vx *= -0.5; }
+          if (bird.y < bird.r){ bird.y = bird.r; bird.vy *= -0.5; }
+
+          // pigs collision
+          for (const p of pigs){
+            if (!p.alive) continue;
+            const dx = p.x - bird.x;
+            const dy = p.y - bird.y;
+            const dist = Math.hypot(dx,dy);
+            if (dist < p.r + bird.r){
+              hitPig(p);
+              const nx = dx/(dist||1);
+              const ny = dy/(dist||1);
+              bird.vx -= nx * 6.5;
+              bird.vy -= ny * 6.5;
+            }
+          }
+
+          // hint when stopped
+          if ((Math.abs(bird.vx)+Math.abs(bird.vy)) < 0.35 && pigs.some(p=>p.alive)){
+            setStatus("ab_try");
+          }
+        }
+
+        draw();
+        raf = requestAnimationFrame(step);
+      }
+
+      function draw(){
+        if (!ctx || !canvas) return;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        // background
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.restore();
+
+        // ground
+        ctx.save();
+        ctx.fillStyle = "rgba(0,0,0,0.10)";
+        ctx.fillRect(0,360,canvas.width,60);
+        ctx.restore();
+
+        // slingshot
+        ctx.save();
+        ctx.strokeStyle = "rgba(0,0,0,0.45)";
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(sling.x-10, 360);
+        ctx.lineTo(sling.x-10, sling.y-10);
+        ctx.moveTo(sling.x+10, 360);
+        ctx.lineTo(sling.x+10, sling.y-10);
+        ctx.stroke();
+        ctx.restore();
+
+        // band
+        ctx.save();
+        ctx.strokeStyle = "rgba(0,0,0,0.25)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(sling.x, sling.y);
+        ctx.lineTo(bird.x, bird.y);
+        ctx.stroke();
+        ctx.restore();
+
+        // pigs
+        for (const p of pigs){
+          if (!p.alive) continue;
+          ctx.save();
+          ctx.fillStyle = "rgba(0,0,0,0.12)";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fill();
+          ctx.restore();
+
+          ctx.save();
+          ctx.fillStyle = "rgba(0,0,0,0.35)";
+          ctx.beginPath();
+          ctx.arc(p.x-5, p.y-4, 2, 0, Math.PI*2);
+          ctx.arc(p.x+5, p.y-4, 2, 0, Math.PI*2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // bird
+        ctx.save();
+        ctx.fillStyle = "rgba(0,0,0,0.18)";
+        ctx.beginPath();
+        ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+
+        // hint ring
+        if (!bird.launched){
+          ctx.save();
+          ctx.strokeStyle = "rgba(0,0,0,0.15)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(sling.x, sling.y, 85, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      let raf = 0;
+
+      function start(){
+        if (raf) return;
+        raf = requestAnimationFrame(step);
+      }
+      function stop(){
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      }
+
+      function bind(){
+        if (!canvas) return;
+
+        canvas.addEventListener("pointerdown", (e)=>{
+          if (bird.launched) return;
+          const p = pointerPos(e);
+          const d = Math.hypot(p.x - bird.x, p.y - bird.y);
+          if (d <= bird.r + 10){
+            dragging=true;
+            canvas.setPointerCapture?.(e.pointerId);
+          }
+        });
+        canvas.addEventListener("pointermove", (e)=>{
+          if (!dragging || bird.launched) return;
+          const p = pointerPos(e);
+          const c = clampPull(p.x,p.y);
+          bird.x = c.x; bird.y = c.y;
+          draw();
+        });
+        const up = (e)=>{
+          if (!dragging || bird.launched) { dragging=false; return; }
+          dragging=false;
+
+          const dx = sling.x - bird.x;
+          const dy = sling.y - bird.y;
+          bird.vx = dx * 0.22;
+          bird.vy = dy * 0.22;
+          bird.launched = true;
+          setStatus("");
+          start();
+        };
+        canvas.addEventListener("pointerup", up);
+        canvas.addEventListener("pointercancel", up);
+      }
+
+      function ensure(){
+        if (!canvas || !ctx) return;
+        if (!canvas.__abBound){
+          canvas.__abBound = true;
+          bind();
+          resetBtn && resetBtn.addEventListener("click", ()=> resetWorld());
+        }
+        if (!pigs.length) resetWorld();
+        start();
+      }
+
+      function refreshStatusText(){
+        if (!statusEl) return;
+        if (!statusKey) return;
+        statusEl.textContent = gt(statusKey);
+      }
+
+      return { ensure, stop, refreshStatusText };
+    })();
+
+
+    window.addEventListener("load", () => {
+      applyLang(langSel.value || "zh");
+      if (typeof gamesSetLang === "function") gamesSetLang(langSel.value || "zh");
+      DIGITS_LONG = Number(selL.value) || 3;
+      DIGITS_SHORT = Number(selS.value) || 3;
+      
+      if (pageHidden) pageHidden.classList.add("hidden");
+recalcAll();
+      setTimeout(recalcAll, 50);
+      setTimeout(recalcAll, 250);
+    });
+  </script>
+</body>
+</html>
