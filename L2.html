@@ -203,7 +203,7 @@
 
     .tpHeadRow{
       display:grid;
-      grid-template-columns: 1.15fr 0.8fr 0.9fr 0.9fr 0.9fr;
+      grid-template-columns: 1.15fr 0.8fr 0.9fr 0.9fr;
       column-gap: 34px;
       align-items:end;
       font-size: 26px;
@@ -213,7 +213,7 @@
 
     .tpInputRow{
       display:grid;
-      grid-template-columns: 1.15fr 0.8fr 0.9fr 0.9fr 0.9fr;
+      grid-template-columns: 1.15fr 0.8fr 0.9fr 0.9fr;
       column-gap: 34px;
       align-items:center;
     }
@@ -274,20 +274,23 @@
       justify-content:flex-start;
     }
 
+    
     .tpTable{
       margin-top: 32px;
       display:grid;
-      grid-template-columns: 90px 180px;
+      /* 对齐到上方表头：买入价 / 杠杆 / 利润% / 止盈价（这里只用到杠杆与利润%两列） */
+      grid-template-columns: 1.15fr 0.8fr 0.9fr 0.9fr;
+      column-gap: 34px;
       row-gap: 18px;
-      column-gap: 80px;
-      justify-content:center;
       align-items:center;
+      width: 100%;
       font-size: 30px;
+      transform: translateX(-1cm);
     }
-    .k{ text-align:center; }
-    .v{ text-align:center; }
+    .tpTable .k{ grid-column: 2; text-align:center; }
+    .tpTable .v{ grid-column: 3; text-align:center; }
 
-    .mobileTPRow{ display:none; }
+.mobileTPRow{ display:none; }
 
     /* ===================== Profit（利润） ===================== */
     /* ✅ 你要的：利润小数位（放到红框位置：输入框下面那条） */
@@ -320,7 +323,7 @@
       margin-bottom: 10px;
     }
     .pHeadRow div{ white-space:nowrap; }
-
+    .pHeadRow{ transform: translateX(10px); }
     .pInputRow{
       display:grid;
       grid-template-columns: 1fr;
@@ -388,18 +391,29 @@
       letter-spacing: .3px;
     }
 
+    
+    
+    
     .pTable{
       margin-top: 26px;
       display:grid;
-      grid-template-columns: 90px 240px;
+      /* 对齐到上方输入框：保证金 / 杠杆 / 开仓均价 / 目标价（这里只用到杠杆与中间列） */
+      grid-template-columns: var(--p-col-m) var(--p-col-l) var(--p-col-e) var(--p-col-t);
+      column-gap: 22px;
       row-gap: 18px;
-      column-gap: 80px;
-      justify-content:center;
       align-items:center;
+      width: 100%;
       font-size: 30px;
+      transform: translateX(-1cm);
     }
+    
+    .pTable .k{ grid-column: 2; text-align:center; }
+    .pTable .v{ grid-column: 3; text-align:center; }
+.pTable .k{ grid-column: 2; text-align:center; }
+    /* ✅ 利润值列往左放到第3列，使整体位置与止盈价页一致（不贴到最右） */
+    .pTable .v{ grid-column: 3; text-align:center; }
 
-    .mobileProfitRow{ display:none; }
+.mobileProfitRow{ display:none; }
 
     .hidden{ display:none !important; }
 
@@ -464,7 +478,10 @@
       .profitRow{ display:none; }
       .pTable{ display:none; }
 
-      /* ✅ 手机端也要利润小数位：显示出来，并做成和 TP 类似的行 */
+      
+    .pTable .k{ grid-column: 2; text-align:center; }
+    .pTable .v{ grid-column: 3; text-align:center; }
+/* ✅ 手机端也要利润小数位：显示出来，并做成和 TP 类似的行 */
       .profitDigitsRow{
         justify-content:flex-start;
         margin: 10px 0 6px;
@@ -695,8 +712,7 @@
             <div id="h_long_entry">多单买入价</div>
             <div id="h_long_lev">杠杆/倍</div>
             <div id="h_long_profit">利润%</div>
-            <div class="deskOnly" id="h_long_norm">正常利润</div>
-            <div class="deskOnly" id="h_long_tp">止盈价</div>
+<div class="deskOnly" id="h_long_tp">止盈价</div>
           </div>
 
           <div class="tpInputRow">
@@ -710,9 +726,7 @@
                 </div>
               </div>
             </div>
-
-            <div class="out" id="long_norm">—</div>
-            <div class="out" id="long_tp">—</div>
+<div class="out" id="long_tp">—</div>
           </div>
 
           <div class="mobileTPRow">
@@ -750,8 +764,7 @@
             <div id="h_short_entry">空单买入价</div>
             <div id="h_short_lev">杠杆/倍</div>
             <div id="h_short_profit">利润%</div>
-            <div class="deskOnly" id="h_short_norm">正常利润</div>
-            <div class="deskOnly" id="h_short_tp">止盈价</div>
+<div class="deskOnly" id="h_short_tp">止盈价</div>
           </div>
 
           <div class="tpInputRow">
@@ -765,9 +778,7 @@
                 </div>
               </div>
             </div>
-
-            <div class="out" id="short_norm">—</div>
-            <div class="out" id="short_tp">—</div>
+<div class="out" id="short_tp">—</div>
           </div>
 
           <div class="mobileTPRow">
@@ -1030,11 +1041,15 @@
       return Number.isFinite(n) ? n : NaN;
     }
 
-    function filterDecimal(input){
+    
+    function filterSignedDecimal(input){
       input.addEventListener("input", () => {
         let v = normalizeNumberText(input.value);
         v = v.replace(/[\u200B-\u200D\uFEFF]/g, "");
-        v = v.replace(/[^0-9.,]/g, "");
+        // allow leading minus
+        v = v.replace(/[^0-9.,\-]/g, "");
+        // keep only first '-'
+        v = v.replace(/(?!^)-/g, "");
         const i = v.search(/[.,]/);
         if (i !== -1){
           const head = v.slice(0, i + 1);
@@ -1045,7 +1060,30 @@
       });
     }
 
-    function filterInteger(input){
+function filterDecimal(input){
+      input.addEventListener("input", () => {
+        let v = normalizeNumberText(input.value);
+        v = v.replace(/[\u200B-\u200D\uFEFF]/g, "");
+
+        // allow digits, dot/comma, and a leading minus
+        v = v.replace(/[^0-9.,-]/g, "");
+
+        // keep only one leading minus
+        const neg = v.trim().startsWith("-");
+        v = v.replace(/-/g, "");
+        if (neg) v = "-" + v;
+
+        // keep only first decimal separator
+        const i = v.search(/[.,]/);
+        if (i !== -1){
+          const head = v.slice(0, i + 1);
+          const tail = v.slice(i + 1).replace(/[.,]/g, "");
+          v = head + tail;
+        }
+
+        if (input.value !== v) input.value = v;
+      });
+    }function filterInteger(input){
       input.addEventListener("input", () => {
         const vv = normalizeNumberText(input.value);
         const v = vv.replace(/[^\d]/g, "");
@@ -1304,10 +1342,7 @@ btnTP.classList.toggle("active", tpOn);
 
       const normOut = $(isLong ? "long_norm" : "short_norm");
       const tpOut   = $(isLong ? "long_tp" : "short_tp");
-
-      normOut.textContent = Number.isFinite(norm) ? (formatNumber(norm, 2) + "%") : "—";
-
-      let tpBase = NaN;
+let tpBase = NaN;
       if (Number.isFinite(entry) && Number.isFinite(norm)){
         tpBase = isLong ? entry * (1 + norm/100) : entry * (1 - norm/100);
         tpOut.textContent = formatNumber(tpBase, digits);
@@ -1435,7 +1470,8 @@ btnTP.classList.toggle("active", tpOn);
     // ✅ 批量绑定更简洁（功能不变）
     const bindList = (ids, fn) => ids.forEach(id => { const el = $(id); fn(el); bindRecalc(el); });
 
-    bindList(["long_entry","long_profit","short_entry","short_profit"], filterDecimal);
+    bindList(["long_entry","short_entry"], filterDecimal);
+    bindList(["long_profit","short_profit"], filterSignedDecimal);
     ["long_lev","short_lev"].forEach(id => { const el=$(id); filterInteger(el); bindRecalc(el); });
 
     bindUppercase($("long_code"));
