@@ -1003,18 +1003,17 @@
 
     const LEV_LIST = [1, 5, 10, 20, 50, 100];
 
-    const DECIMAL_SEP = (() => {
-      try{
-        const s = new Intl.NumberFormat().format(1.1);
-        const m = s.match(/1([^0-9])1/);
-        return m ? m[1] : ".";
-      } catch { return "."; }
-    })();
+    function decimalSep(){
+      // Force decimal separator by selected language (not by OS/browser locale)
+      const v = (document.getElementById("lang")?.value || "zh");
+      return (v === "de") ? "," : ".";
+    }
 
-    function formatNumber(n, digits){
+function formatNumber(n, digits){
       if (!Number.isFinite(n)) return "—";
       const s = n.toFixed(digits);
-      return (DECIMAL_SEP === ".") ? s : s.replace(".", DECIMAL_SEP);
+      const sep = decimalSep();
+      return (sep === ".") ? s : s.replace(".", sep);
     }
 
     function normalizeNumberText(v){
